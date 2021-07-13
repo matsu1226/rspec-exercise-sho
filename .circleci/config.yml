@@ -37,7 +37,8 @@ jobs:
       - run:
           name: yarn Install
           command: yarn install
-      - run: bundle exec bin/webpack    
+      # - run: bundle exec bin/webpack    
+      - run: bundle exec webpacker:binstubs    
       - run:
           name: RSpec
           command: bundle exec rspec  # RSpec
