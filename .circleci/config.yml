@@ -3,25 +3,21 @@ orbs:
   ruby: circleci/ruby@1.1.2   # config.ymlのruby向け記法を導入
   node: circleci/node@2
 
-commands: # setupでまとめる
-  setup:
-    steps:
-      - checkout
-      - ruby/install-deps   #bundle install
-
 jobs:
   build:  # first job => githubとの連携、bundle install
     docker:
       - image: circleci/ruby:2.7-node  # ※1
-    working_directory: ~/repec-exercise-sho/src
+    working_directory: ~/repec-exercise-sho/src   # circleCI内の作業directory設定
     steps:
-      - setup
+      - checkout:   # githubの情報をcircleCI側にコピー
+          path: ~/repec-exercise-sho
+      - ruby/install-deps   #bundle install
 
   test:   # second job => mySQLとrubyの導入、環境の設定
     docker:
       - image: circleci/ruby:2.7-node
       - image: circleci/mysql:5.5
-        environment:    # mySQL /app/config/database.yml参照
+        environment:    # mySQLの環境 /app/config/database.yml参照
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: app_test
           MYSQL_USER: root
@@ -30,9 +26,11 @@ jobs:
       BUNDLE_RETRY: "3"
       APP_DATABASE_HOST: "127.0.0.1"  # local host の指定
       RAILS_ENV: test
-    working_directory: ~/repec-exercise-sho/src
+    working_directory: ~/repec-exercise-sho/src  # circleCI内のtest jobの作業directory設定
     steps:
-      - setup
+      - checkout:   # githubの情報をcircleCI側にコピー
+          path: ~/repec-exercise-sho
+      - ruby/install-deps   #bundle install
       - run:
           name: Database setup
           command: bundle exec rails db:migrate
