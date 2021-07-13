@@ -2,17 +2,12 @@ version: 2.1
 orbs:
   ruby: circleci/ruby@1.1.2   # config.ymlのruby向け記法を導入
   node: circleci/node@2
-  # heroku: circleci/heroku@1.2.3
 
 commands: # setupでまとめる
   setup:
     steps:
       - checkout
       - ruby/install-deps   #bundle install
-      # - node/install-packages:
-      #     pkg-manager: yarn
-      #     cache-key: "yarn.lock"
-
 
 jobs:
   build:  # first job => githubとの連携、bundle install
@@ -38,41 +33,12 @@ jobs:
     working_directory: ~/repec-exercise-sho/src
     steps:
       - setup
-      # - run:
-      #     name: yarn Install
-      #     command: yarn install
-      # - run: bundle exec bin/webpack
       - run:
           name: Database setup
           command: bundle exec rails db:migrate
-      # - run:
-      #     name: Database setup
-      #     command: bundle exec rails db:schema:load --trace
       - run:
           name: RSpec
           command: bundle exec rspec  # RSpec
-
-  # deploy:
-  #   docker:
-  #     - image: circleci/ruby:2.7-node
-  #   steps:
-  #     - checkout
-  #     - setup_remote_docker:
-  #         version: 19.03.13
-  #     - heroku/install
-  #     - run:
-  #         name: heroku login
-  #         command: heroku container:login
-  #     - run:
-  #         name: push docker image
-  #         command: heroku container:push web -a $HEROKU_APP_NAME
-  #     - run:
-  #         name: release docker image
-  #         command: heroku container:release web -a $HEROKU_APP_NAME
-  #     - run:
-  #         name: database setup
-  #         command: heroku run bundle exec rake db:migrate RAILS_ENV=production -a $HEROKU_APP_NAME
-
 workflows:
   version: 2
   build_test_and_deploy:
@@ -81,12 +47,6 @@ workflows:
       - test: # second job
           requires:
             - build # before second job
-      # - deploy:
-      #     requires:
-      #       - test
-          # filters:
-          #   branches:
-          #     only: main
 
 
 # ※1 imageの比較(https://circleci.com/developer/images/image/cimg/ruby)
