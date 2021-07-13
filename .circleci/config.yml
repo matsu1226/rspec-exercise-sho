@@ -6,7 +6,7 @@ orbs:
 jobs:
   build:  # first job => githubとの連携、bundle install
     docker:
-      - image: circleci/ruby:2.7  
+      - image: circleci/ruby:2.7-node  # ※1
     working_directory: ~/repec-exercise-sho/src
     steps:
       - checkout:
@@ -15,7 +15,7 @@ jobs:
 
   test:   # second job => mySQLとrubyの導入、環境の設定
     docker:
-      - image: circleci/ruby:2.7
+      - image: circleci/ruby:2.7-node
       - image: circleci/mysql:5.5
         environment:    # mySQL /app/config/database.yml参照
           MYSQL_ROOT_PASSWORD: password
@@ -31,9 +31,9 @@ jobs:
       - checkout:
           path: ~/repec-exercise-sho
       - ruby/install-deps
-      # - run:
-      #     name: yarn Install
-      #     command: yarn install
+      - run:
+          name: yarn Install
+          command: yarn install
       - run: bundle exec bin/webpack
       - run:
           name: Database setup
@@ -47,7 +47,7 @@ jobs:
 
   # deploy:
   #   docker:
-  #     - image: circleci/ruby:2.7
+  #     - image: circleci/ruby:2.7-node
   #   steps:
   #     - checkout
   #     - setup_remote_docker:
@@ -80,3 +80,13 @@ workflows:
           # filters:
           #   branches:
           #     only: main
+
+
+# ※1 imageの比較(https://circleci.com/developer/images/image/cimg/ruby)
+#  A => circleci/ruby:2.7.4 (circleci/ruby:2.7)
+#  B => circleci/ruby:2.7.4-node (circleci/ruby:2.7-node)
+#  C => circleci/ruby:2.7.4-browsers (circleci/ruby:2.7-browsers)
+
+# A = build-essential 12.8ubuntu1.1, bundler 2.2.22, curl 7.68.0, docker 20.10.5, docker-compose 1.28.6, dockerize v0.6.1, gem 3.2.22, git 2.25.1, jq 1.6, ruby 2.7.4p191, ubuntu 20.04.2 LTS, wget 1.20.3
+# B = A +  node 14.17.3, yarn 1.22.5
+# C = B +  java 11.0.11, , selenium 3.141.59
