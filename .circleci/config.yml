@@ -3,15 +3,23 @@ orbs:
   ruby: circleci/ruby@1.1.2   # config.ymlのruby向け記法を導入
   # heroku: circleci/heroku@1.2.3
 
+commands: # setupでまとめる
+  setup:
+    steps:
+      - checkout
+      - ruby/install-deps   #bundle install
+      - node/install-packages:
+          pkg-manager: yarn
+          cache-key: "yarn.lock"
+
+
 jobs:
   build:  # first job => githubとの連携、bundle install
     docker:
       - image: circleci/ruby:2.7-node  # ※1
     working_directory: ~/repec-exercise-sho/src
     steps:
-      - checkout:
-          path: ~/repec-exercise-sho
-      - ruby/install-deps #bundle install
+      - setup
 
   test:   # second job => mySQLとrubyの導入、環境の設定
     docker:
@@ -28,13 +36,11 @@ jobs:
       RAILS_ENV: test
     working_directory: ~/repec-exercise-sho/src
     steps:
-      - checkout:
-          path: ~/repec-exercise-sho
-      - ruby/install-deps
-      - run:
-          name: yarn Install
-          command: yarn install
-      - run: bundle exec bin/webpack
+      - setup
+      # - run:
+      #     name: yarn Install
+      #     command: yarn install
+      # - run: bundle exec bin/webpack
       - run:
           name: Database setup
           command: bundle exec rails db:migrate
