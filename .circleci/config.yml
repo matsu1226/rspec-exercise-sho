@@ -59,3 +59,5 @@ workflows:
 # A = build-essential 12.8ubuntu1.1, bundler 2.2.22, curl 7.68.0, docker 20.10.5, docker-compose 1.28.6, dockerize v0.6.1, gem 3.2.22, git 2.25.1, jq 1.6, ruby 2.7.4p191, ubuntu 20.04.2 LTS, wget 1.20.3
 # B = A +  node 14.17.3, yarn 1.22.5
 # C = B +  java 11.0.11, , selenium 3.141.59
+
+# B,Cはyarn含む
