@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   ruby: circleci/ruby@1.1.2   # config.ymlのruby向け記法を導入
+  node: circleci/node@2
   # heroku: circleci/heroku@1.2.3
 
 commands: # setupでまとめる
