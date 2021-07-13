@@ -1,30 +1,30 @@
 version: 2.1
-orbs:
-  ruby: circleci/ruby@1.1.2   # config.ymlのruby向け記法を導入
-  node: circleci/node@2
-  # heroku: circleci/heroku@1.2.3
 
-commands: # setupでまとめる
+orbs:
+  ruby: circleci/ruby@1.0
+  node: circleci/node@2
+  # heroku: circleci/heroku@1.1.0
+
+# setupでまとめる
+commands:
   setup:
     steps:
       - checkout
-      - ruby/install-deps   #bundle install
+      - ruby/install-deps
       - node/install-packages:
           pkg-manager: yarn
           cache-key: "yarn.lock"
 
-
 jobs:
-  build:  # first job => githubとの連携、bundle install
+  build:
     docker:
-      - image: circleci/ruby:2.7-node  # ※1
+      - image: circleci/ruby:2.6.3-node
     working_directory: ~/repec-exercise-sho/src
     steps:
       - setup
-
-  test:   # second job => mySQLとrubyの導入、環境の設定
+  test:
     docker:
-      - image: circleci/ruby:2.7-node
+      - image: circleci/ruby:2.6.3-node
       - image: circleci/mysql:5.5
         environment:    # mySQL /app/config/database.yml参照
           MYSQL_ROOT_PASSWORD: password
@@ -39,61 +39,41 @@ jobs:
     steps:
       - setup
       # - run:
-      #     name: yarn Install
-      #     command: yarn install
-      # - run: bundle exec bin/webpack
-      - run:
-          name: Database setup
-          command: bundle exec rails db:migrate
+      #     name: Wait for DB
+      #     command: dockerize -wait tcp://localhost:5432 -timeout 1m
       # - run:
       #     name: Database setup
       #     command: bundle exec rails db:schema:load --trace
       - run:
-          name: RSpec
-          command: bundle exec rspec  # RSpec
+          name: Database setup
+          command: bundle exec rails db:migrate
+      - run:
+          name: Rspec
+          command: bundle exec rspec
 
   # deploy:
-  #   docker:
-  #     - image: circleci/ruby:2.7-node
+  #   executor: heroku/default
   #   steps:
   #     - checkout
-  #     - setup_remote_docker:
-  #         version: 19.03.13
   #     - heroku/install
+  #     - heroku/deploy-via-git:
+  #         maintenance-mode: true
   #     - run:
-  #         name: heroku login
-  #         command: heroku container:login
-  #     - run:
-  #         name: push docker image
-  #         command: heroku container:push web -a $HEROKU_APP_NAME
-  #     - run:
-  #         name: release docker image
-  #         command: heroku container:release web -a $HEROKU_APP_NAME
-  #     - run:
-  #         name: database setup
-  #         command: heroku run bundle exec rake db:migrate RAILS_ENV=production -a $HEROKU_APP_NAME
+  #         name: DB migrate
+  #         command: heroku run rails db:migrate --app $HEROKU_APP_NAME
 
 workflows:
   version: 2
-  build_test_and_deploy:
+  test_and_deploy:
     jobs:
-      - build # first job
-      - test: # second job
+      - build
+      - test:
           requires:
-            - build # before second job
+            - build
       # - deploy:
       #     requires:
+      #       - build
       #       - test
-          # filters:
-          #   branches:
-          #     only: main
-
-
-# ※1 imageの比較(https://circleci.com/developer/images/image/cimg/ruby)
-#  A => circleci/ruby:2.7.4 (circleci/ruby:2.7)
-#  B => circleci/ruby:2.7.4-node (circleci/ruby:2.7-node)
-#  C => circleci/ruby:2.7.4-browsers (circleci/ruby:2.7-browsers)
-
-# A = build-essential 12.8ubuntu1.1, bundler 2.2.22, curl 7.68.0, docker 20.10.5, docker-compose 1.28.6, dockerize v0.6.1, gem 3.2.22, git 2.25.1, jq 1.6, ruby 2.7.4p191, ubuntu 20.04.2 LTS, wget 1.20.3
-# B = A +  node 14.17.3, yarn 1.22.5
-# C = B +  java 11.0.11, , selenium 3.141.59
+      #     filters:
+      #       branches:
+      #         only: master
