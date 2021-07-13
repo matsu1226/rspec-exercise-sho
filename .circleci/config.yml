@@ -35,6 +35,10 @@ jobs:
           name: Database setup
           command: bundle exec rails db:migrate
       - run:
+          name: yarn Install
+          command: yarn install
+      - run: bundle exec bin/webpack    
+      - run:
           name: RSpec
           command: bundle exec rspec  # RSpec
 workflows:
