@@ -31,15 +31,16 @@ jobs:
       - checkout:   # githubの情報をcircleCI側にコピー
           path: ~/repec-exercise-sho
       - ruby/install-deps   #bundle install
-      - run: bundle install --path vendor/bundle
       - run:
           name: Database setup
           command: bundle exec rails db:migrate
       - run:
           name: yarn Install
           command: yarn install
-      - run: bundle exec bin/webpack    
+      # - run: bundle exec bin/webpack    
       # - run: bundle exec webpacker:binstubs    
+      - run: rails webpacker:install
+      - run: rails webpacker:compile
       - run:
           name: RSpec
           command: bundle exec rspec  # RSpec
