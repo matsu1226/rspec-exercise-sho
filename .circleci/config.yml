@@ -34,12 +34,12 @@ jobs:
       - run:
           name: Database setup
           command: bundle exec rails db:create
-      - run:
-          name: yarn Install
-          command: yarn install
-      - run:   
-          name: bin/webpack
-          command: bundle exec bin/webpack
+      # - run:
+      #     name: yarn Install
+      #     command: yarn install
+      # - run:   
+      #     name: bin/webpack
+      #     command: bundle exec bin/webpack
       # # - run: bundle exec webpacker:binstubs    
       # - run: rails webpacker:install
       # - run: rails webpacker:compile
