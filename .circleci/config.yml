@@ -7,7 +7,7 @@ jobs:
   build:  # first job => githubとの連携、bundle install
     docker:
       - image: circleci/ruby:2.7-node  # ※1
-    working_directory: ~/repec-exercise-sho  # circleCI内の作業directory設定
+    working_directory: ~/repec-exercise-sho/src   # circleCI内の作業directory設定
     steps:
       - checkout:   # githubの情報をcircleCI側にコピー
           path: ~/repec-exercise-sho
@@ -26,18 +26,20 @@ jobs:
       BUNDLE_RETRY: "3"
       APP_DATABASE_HOST: "127.0.0.1"  # local host の指定
       RAILS_ENV: test
-    working_directory: ~/repec-exercise-sho  # circleCI内のtest jobの作業directory設定
+    working_directory: ~/repec-exercise-sho/src  # circleCI内のtest jobの作業directory設定
     steps:
       - checkout:   # githubの情報をcircleCI側にコピー
           path: ~/repec-exercise-sho
       - ruby/install-deps   #bundle install
       - run:
           name: Database setup
-          command: bundle exec rails db:migrate
+          command: bundle exec rails db:create
       - run:
           name: yarn Install
           command: yarn install
       - run: bundle exec bin/webpack    
+          name: bin/webpack
+          command: bundle exec bin/webpack
       # # - run: bundle exec webpacker:binstubs    
       # - run: rails webpacker:install
       # - run: rails webpacker:compile
