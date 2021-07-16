@@ -37,9 +37,12 @@ jobs:
       # - run:
       #     name: yarn Install
       #     command: yarn install
-      # - run:   
-      #     name: bin/webpack
-      #     command: bundle exec bin/webpack
+      - run:   
+          name: bundle config
+          command: bundle config
+      - run:   
+          name: bin/webpack
+          command: bundle exec bin/webpack
       # # - run: bundle exec webpacker:binstubs    
       # - run: rails webpacker:install
       # - run: rails webpacker:compile
