@@ -28,8 +28,8 @@ src/.byebug_history
 # Ignore master key for decrypting credentials and more.
 src/config/master.key
 
-src/public/packs
-src/public/packs-test
+# src/public/packs
+# src/public/packs-test
 src/node_modules
 src/yarn-error.log
 src/yarn-debug.log*
