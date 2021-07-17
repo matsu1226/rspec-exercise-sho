@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   ruby: circleci/ruby@1.1.2   # config.ymlのruby向け記法を導入
   node: circleci/node@2
+  heroku: circleci/heroku@1.2.3
 
 jobs:
   build:  # first job => githubとの連携、bundle install
@@ -11,7 +12,7 @@ jobs:
     steps:
       - checkout:   # githubの情報をcircleCI側にコピー
           path: ~/repec-exercise-sho
-      - ruby/install-deps   #bundle install
+      - ruby/install-deps   #orbs)bundle install
 
   test:   # second job => mySQLとrubyの導入、環境の設定
     docker:
@@ -30,13 +31,37 @@ jobs:
     steps:
       - checkout:   # githubの情報をcircleCI側にコピー
           path: ~/repec-exercise-sho
-      - ruby/install-deps   #bundle install
+      - ruby/install-deps   #orbs)bundle install
       - run:
           name: Database setup
           command: bundle exec rails db:create
       - run:
           name: RSpec
           command: bundle exec rspec  # RSpec
+
+  deploy:
+    docker:
+      - image: circleci/ruby:2.7
+    steps:
+      - checkout   
+      - setup_remote_docker:  # config.yml中でdocker commandを使えるようにする
+          version:  19.03.13
+      - heroku/install  # orbs)config.yml中でheroku commandを使えるようにする
+      - run:
+          name: heroku login
+          command: heroku container:login
+      - run:
+          name: push docker image
+          command: heroku container:push web -a $HEROKU_APP_NAME  
+          # https://app.circleci.com/pipelines/github/matsu1226/rspec-exercise-sho => environment variablesで変更
+          # HEROKU_APP_NAME, HEROKU_API_KEY(https://dashboard.heroku.com/account)
+      - run:
+          name: release docker image
+          command: heroku container:release web -a $HEROKU_APP_NAME
+      - run:
+          name: database setup
+          command: heroku run bundle exec rake db:migrate RAILS_ENV=production -a $HEROKU_APP_NAME
+
 workflows:
   version: 2
   build_test_and_deploy:
@@ -45,6 +70,12 @@ workflows:
       - test: # second job
           requires:
             - build # before second job
+      - deploy: # third job
+          requires:
+            - test  # before third job
+          filters:
+            branches:
+              only:main # Run third job only when modified "main branch" 
 
 
 # ※1 imageの比較(https://circleci.com/developer/images/image/cimg/ruby)
