@@ -2,7 +2,9 @@ version: 2.1
 orbs:
   ruby: circleci/ruby@1.1.2   # config.ymlのruby向け記法を導入
   node: circleci/node@2
+
   heroku: circleci/heroku@1.2.3
+
 
 jobs:
   build:  # first job => githubとの連携、bundle install
@@ -12,7 +14,9 @@ jobs:
     steps:
       - checkout:   # githubの情報をcircleCI側にコピー
           path: ~/repec-exercise-sho
+
       - ruby/install-deps   #orbs)bundle install
+
 
   test:   # second job => mySQLとrubyの導入、環境の設定
     docker:
@@ -62,6 +66,7 @@ jobs:
           name: database setup
           command: heroku run bundle exec rake db:migrate RAILS_ENV=production -a $HEROKU_APP_NAME
 
+
 workflows:
   version: 2
   build_test_and_deploy:
@@ -76,6 +81,7 @@ workflows:
           filters:
             branches:
               only:main # Run third job only when modified "main branch" 
+
 
 
 # ※1 imageの比較(https://circleci.com/developer/images/image/cimg/ruby)
