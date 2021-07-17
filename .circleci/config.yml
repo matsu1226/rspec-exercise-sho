@@ -77,7 +77,6 @@ workflows:
             branches:
               only: main # Run third job only when modified "main branch" 
 
-
 # ※1 imageの比較(https://circleci.com/developer/images/image/cimg/ruby)
 #  A => circleci/ruby:2.7.4 (circleci/ruby:2.7)
 #  B => circleci/ruby:2.7.4-node (circleci/ruby:2.7-node)
