@@ -1,46 +1,38 @@
 require 'rails_helper'
 
-RSpec.describe "StaticPages", type: :request do
+describe "StaticPages" do
+  subject{ page }   # shouldの呼び出し => Capybaraのpage変数を使用
+  include UtilitiesSupport
+
   describe "Home page" do
-    # Sample Appの文字列を持つことを確認
-    it "should have a content 'Sample App'" do
-      # get static_pages_index_path
-      visit '/static_pages/home'
-      expect(page).to have_content('Sample App')
-    end
-    # full_title custom helperの条件分岐が機能しているかを確認(provide(:title)がない場合)
-    it "should have the base title" do
-      visit '/static_pages/home'
-      expect(page).to have_title("Ruby on Rails Tutorial Sample App")
-    end
-    # Home文字列を削除したことを確認
-    it"should not have a custom page title"do
-      visit '/static_pages/home'
-      expect(page).not_to have_title('Home |') 
-    end
+    before { visit root_path }
+
+    it { should have_content("Sample App") }
+    it { should have_title(full_title("")) }
+    it { should_not have_title("Home |")}
   end
 
-
   describe "Help page" do
-    it "should have the content 'Help'" do
-      visit '/static_pages/help'
-      expect(page).to have_content('Help')
-    end
-    it "should have the title 'Help'" do
-      visit '/static_pages/help'
-      expect(page).to have_title("Help | Ruby on Rails Tutorial Sample App")
-    end
+    before { visit help_path }
+
+    it { should have_content("Help") }
+    it { should have_title(full_title("Help")) }
   end
 
 
   describe "About page" do
-    it "should have the content 'About Us'" do
-      visit '/static_pages/about'
-      expect(page).to have_content('About Us')
-    end
-    it "should have the title 'About Us'" do
-      visit '/static_pages/about'
-      expect(page).to have_title("About Us | Ruby on Rails Tutorial Sample App")
-    end
+    before { visit about_path }
+    
+    it { should have_content("About Us") }
+    it { should have_title(full_title("About Us")) }
   end
+
+
+  describe "Contact page" do
+    before { visit contact_path }
+
+    it { should have_content("Contact") }
+    it { should have_title(full_title("Contact")) }
+  end
+
 end
