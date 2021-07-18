@@ -34,7 +34,7 @@ jobs:
       - ruby/install-deps   #orbs)bundle install
       - run:
           name: Database setup
-          command: bundle exec rails db:create
+          command: bundle exec rails db:migrate
       - run:
           name: RSpec
           command: bundle exec rspec  # RSpec
