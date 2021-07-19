@@ -7,14 +7,6 @@ jobs:
     steps:
     - checkout:
         path: ~/repec-exercise-sho
-    - run:
-        name: setup bundler
-        command: |
-          gem update --system
-          gem uninstall bundler
-          rm /usr/local/bin/bundle
-          rm /usr/local/bin/bundler
-          gem install bundler
     - restore_cache:
         keys:
         - gems-{{ .Environment.CACHE_VERSION }}-{{ checksum "./Gemfile.lock"  }}-{{ .Branch }}
@@ -108,7 +100,7 @@ jobs:
         - ./vendor/bundle
     - run:
         name: Database setup
-        command: bundle exec rails db:migrate
+        command: rails db:migrate
     - run:
         name: RSpec
         command: bundle exec rspec
