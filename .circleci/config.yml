@@ -112,7 +112,7 @@ jobs:
     #     command: which bundle exec rails
     - run:
         name: Database setup
-        command: /usr/local/bin/bundle/rails db:migrate
+        command: /usr/local/bin/bundle rails db:migrate
     - run:
         name: RSpec
         command: bundle exec rspec
