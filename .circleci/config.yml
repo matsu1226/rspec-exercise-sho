@@ -32,6 +32,9 @@ jobs:
       - checkout:   # githubの情報をcircleCI側にコピー
           path: ~/repec-exercise-sho
       - ruby/install-deps   #orbs)bundle install
+      # - run:
+      #     name: bundle install again
+      #     command: bundle install --path=./vendor/bundle
       - run:
           name: Database setup
           command: bundle exec rails db:migrate

@@ -1,6 +1,6 @@
 FROM ruby:2.7
 
-# 本番環境を指定
+# 本番環境を指定(docker-compose build時はコメントアウトする)
 ENV RAILS_ENV=production
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
