@@ -37,7 +37,7 @@ jobs:
           command: bundle exec rake db:create
       - run:
           name: RSpec
-          command: rspec  # RSpec
+          command: bundler exec rspec  # RSpec
 
   deploy:
     docker:
