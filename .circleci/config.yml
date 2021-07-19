@@ -99,17 +99,17 @@ jobs:
         paths:
         - ./vendor/bundle
     - run:
+        name: check gem env
+        command: gem environment
+    - run:
+        name: ls 
+        command: ls /usr/local/bundle/bin   
+    - run:
         name: which bundle
         command: which bundle
     - run:
         name: which bundle exec rails
         command: which bundle exec rails
-    - run:
-        name: check gem env
-        command: gem environment
-    - run:
-        name: ls 
-        command: ls /usr/local/bundle/bin/    
     - run:
         name: Database setup
         command: bundle exec rails db:migrate
