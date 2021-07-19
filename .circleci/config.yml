@@ -33,6 +33,9 @@ jobs:
           path: ~/repec-exercise-sho
       - ruby/install-deps   #orbs)bundle install
       - run:
+          name: bundle install
+          command: bundle install
+      - run:
           name: Database setup
           command: bundle exec rake db:create
       - run:
