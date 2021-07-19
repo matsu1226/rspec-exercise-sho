@@ -100,7 +100,7 @@ jobs:
         - ./vendor/bundle
     - run:
         name: Database setup
-        command: rails db:migrate
+        command: bundle exec rails db:migrate
     - run:
         name: RSpec
         command: bundle exec rspec
