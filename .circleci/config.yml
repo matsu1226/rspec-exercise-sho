@@ -10,11 +10,11 @@ jobs:
     - run:
         name: setup bundler
         command: |
-          sudo gem update --system
-          sudo gem uninstall bundler
-          sudo rm /usr/local/bin/bundle
-          sudo rm /usr/local/bin/bundler
-          sudo gem install bundler
+          gem update --system
+          gem uninstall bundler
+          rm /usr/local/bin/bundle
+          rm /usr/local/bin/bundler
+          gem install bundler
     - restore_cache:
         keys:
         - gems-{{ .Environment.CACHE_VERSION }}-{{ checksum "./Gemfile.lock"  }}-{{ .Branch }}
