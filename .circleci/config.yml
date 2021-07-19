@@ -1,248 +1,81 @@
-version: 2
+version: 2.1
+orbs:
+  ruby: circleci/ruby@1.1.2   # config.ymlのruby向け記法を導入
+  node: circleci/node@2
+  heroku: circleci/heroku@1.2.3
+
 jobs:
-  build:
+  build:  # first job => githubとの連携、bundle install
     docker:
-    - image: circleci/ruby:2.7-node
-    working_directory: ~/repec-exercise-sho/src
+      - image: circleci/ruby:2.7-node  # ※1
+    working_directory: ~/repec-exercise-sho/src   # circleCI内の作業directory設定
     steps:
-    - checkout:
-        path: ~/repec-exercise-sho
-    - restore_cache:
-        keys:
-        - gems-{{ .Environment.CACHE_VERSION }}-{{ checksum "./Gemfile.lock"  }}-{{ .Branch }}
-        - gems-{{ .Environment.CACHE_VERSION }}-{{ checksum "./Gemfile.lock"  }}
-    - run:
-        command: |
-          if test -f "Gemfile.lock"; then
-            APP_BUNDLER_VERSION=$(cat Gemfile.lock | tail -1 | tr -d " ")
-            if [ -z "$APP_BUNDLER_VERSION" ]; then
-              echo "Could not find bundler version from Gemfile.lock. Please use bundler-version parameter"
-            else
-              echo "Gemfile.lock is bundled with bundler version $APP_BUNDLER_VERSION"
-            fi
-          fi
+      - checkout:   # githubの情報をcircleCI側にコピー
+          path: ~/repec-exercise-sho
+      - ruby/install-deps   #orbs)bundle install
 
-          if ! [ -z  ]; then
-            echo "Found bundler-version parameter to override"
-            APP_BUNDLER_VERSION=
-          fi
-
-          if ! echo $(bundle version)  | grep -q $APP_BUNDLER_VERSION; then
-            echo "Installing bundler $APP_BUNDLER_VERSION"
-            gem install bundler:$APP_BUNDLER_VERSION
-          else
-            echo "bundler $APP_BUNDLER_VERSION is already installed."
-          fi
-
-          if [ "./vendor/bundle" == "./vendor/bundle" ]; then
-            bundle check --path ./vendor/bundle || bundle install --deployment
-          else
-            bundle check --path ./vendor/bundle || bundle install --path=./vendor/bundle
-          fi
-        name: 'Bundle Install '
-    - save_cache:
-        key: gems-{{ .Environment.CACHE_VERSION }}-{{ checksum "./Gemfile.lock"  }}-{{ .Branch }}
-        paths:
-        - ./vendor/bundle
-  test:
+  test:   # second job => mySQLとrubyの導入、環境の設定
     docker:
-    - image: circleci/ruby:2.7-node
-    - image: circleci/mysql:5.5
-      environment:
-        MYSQL_ROOT_PASSWORD: password
-        MYSQL_DATABASE: app_test
-        MYSQL_USER: root
-    environment:
-    - BUNDLE_JOBS: '3'
-    - BUNDLE_RETRY: '3'
-    - APP_DATABASE_HOST: 127.0.0.1
-    - RAILS_ENV: test
-    working_directory: ~/repec-exercise-sho/src
+      - image: circleci/ruby:2.7-node
+      - image: circleci/mysql:5.5
+        environment:    # mySQLの環境 /app/config/database.yml参照
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: app_test
+          MYSQL_USER: root
+    environment:  # test job 全体の環境設定
+      BUNDLE_JOBS: "3"
+      BUNDLE_RETRY: "3"
+      APP_DATABASE_HOST: "127.0.0.1"  # local host の指定
+      RAILS_ENV: test
+    working_directory: ~/repec-exercise-sho/src  # circleCI内のtest jobの作業directory設定
     steps:
-    - checkout:
-        path: ~/repec-exercise-sho
-    - restore_cache:
-        keys:
-        - gems-{{ .Environment.CACHE_VERSION }}-{{ checksum "./Gemfile.lock"  }}-{{ .Branch }}
-        - gems-{{ .Environment.CACHE_VERSION }}-{{ checksum "./Gemfile.lock"  }}
-    - run:
-        command: |
-          if test -f "Gemfile.lock"; then
-            APP_BUNDLER_VERSION=$(cat Gemfile.lock | tail -1 | tr -d " ")
-            if [ -z "$APP_BUNDLER_VERSION" ]; then
-              echo "Could not find bundler version from Gemfile.lock. Please use bundler-version parameter"
-            else
-              echo "Gemfile.lock is bundled with bundler version $APP_BUNDLER_VERSION"
-            fi
-          fi
+      - checkout:   # githubの情報をcircleCI側にコピー
+          path: ~/repec-exercise-sho
+      - ruby/install-deps   #orbs)bundle install
+      - run:
+          name: Database setup
+          command: bin/rails db:migrate
+      - run:
+          name: RSpec
+          command: bundle exec rspec  # RSpec
 
-          if ! [ -z  ]; then
-            echo "Found bundler-version parameter to override"
-            APP_BUNDLER_VERSION=
-          fi
-
-          if ! echo $(bundle version)  | grep -q $APP_BUNDLER_VERSION; then
-            echo "Installing bundler $APP_BUNDLER_VERSION"
-            gem install bundler:$APP_BUNDLER_VERSION
-          else
-            echo "bundler $APP_BUNDLER_VERSION is already installed."
-          fi
-
-          if [ "./vendor/bundle" == "./vendor/bundle" ]; then
-            bundle check --path ./vendor/bundle || bundle install --deployment
-          else
-            bundle check --path ./vendor/bundle || bundle install --path=./vendor/bundle
-          fi
-        name: 'Bundle Install '
-    - save_cache:
-        key: gems-{{ .Environment.CACHE_VERSION }}-{{ checksum "./Gemfile.lock"  }}-{{ .Branch }}
-        paths:
-        - ./vendor/bundle
-    # - run:
-    #     name: check gem env
-    #     command: gem environment
-    # - run:
-    #     name: ls 
-    #     command: ls /usr/local/bundle/bin   
-    # - run:
-    #     name: which bundle
-    #     command: which bundle
-    # - run:
-    #     name: which bundle exec rails
-    #     command: which bundle exec rails
-    - run:
-        name: Database setup
-        command: /usr/local/bin/bundle rails db:migrate
-    - run:
-        name: RSpec
-        command: bundle exec rspec
   deploy:
     docker:
-    - image: circleci/ruby:2.7
+      - image: circleci/ruby:2.7
     steps:
-    - checkout
-    - setup_remote_docker:
-        version: 19.03.13
-    - run:
-        command: |
-          if [[ $(command -v heroku) == "" ]]; then
-            curl https://cli-assets.heroku.com/install.sh | sh
-          else
-            echo "Heroku is already installed. No operation was performed."
-          fi
-        name: Install Heroku CLI (If not installed)
-    - run:
-        name: heroku login
-        command: heroku container:login
-    - run:
-        name: push docker image
-        command: heroku container:push web -a $HEROKU_APP_NAME
-    - run:
-        name: release docker image
-        command: heroku container:release web -a $HEROKU_APP_NAME
-    - run:
-        name: database setup
-        command: heroku run bundle exec rake db:migrate RAILS_ENV=production -a $HEROKU_APP_NAME
+      - checkout   
+      - setup_remote_docker:  # config.yml中でdocker commandを使えるようにする
+          version:  19.03.13
+      - heroku/install  # orbs)config.yml中でheroku commandを使えるようにする
+      - run:
+          name: heroku login
+          command: heroku container:login
+      - run:
+          name: push docker image
+          command: heroku container:push web -a $HEROKU_APP_NAME  
+          # https://app.circleci.com/pipelines/github/matsu1226/rspec-exercise-sho => environment variablesで変更
+          # HEROKU_APP_NAME, HEROKU_API_KEY(https://dashboard.heroku.com/account)
+      - run:
+          name: release docker image
+          command: heroku container:release web -a $HEROKU_APP_NAME
+      - run:
+          name: database setup
+          command: heroku run bundle exec rake db:migrate RAILS_ENV=production -a $HEROKU_APP_NAME
+
 workflows:
   version: 2
   build_test_and_deploy:
     jobs:
-    - build
-    - test:
-        requires:
-        - build
-    - deploy:
-        filters:
-          branches:
-            only: main
-        requires:
-        - test
-
-
-# ===========
-# orbs使ったver
-
-# version: 2.1
-# orbs:
-#   ruby: circleci/ruby@1.1.2   # config.ymlのruby向け記法を導入
-#   node: circleci/node@2
-#   heroku: circleci/heroku@1.2.3
-
-# jobs:
-#   build:  # first job => githubとの連携、bundle install
-#     docker:
-#       - image: circleci/ruby:2.7-node  # ※1
-#     working_directory: ~/repec-exercise-sho/src   # circleCI内の作業directory設定
-#     steps:
-#       - checkout:   # githubの情報をcircleCI側にコピー
-#           path: ~/repec-exercise-sho
-#       - ruby/install-deps   #orbs)bundle install
-
-#   test:   # second job => mySQLとrubyの導入、環境の設定
-#     docker:
-#       - image: circleci/ruby:2.7-node
-#       - image: circleci/mysql:5.5
-#         environment:    # mySQLの環境 /app/config/database.yml参照
-#           MYSQL_ROOT_PASSWORD: password
-#           MYSQL_DATABASE: app_test
-#           MYSQL_USER: root
-#     environment:  # test job 全体の環境設定
-#       BUNDLE_JOBS: "3"
-#       BUNDLE_RETRY: "3"
-#       APP_DATABASE_HOST: "127.0.0.1"  # local host の指定
-#       RAILS_ENV: test
-#     working_directory: ~/repec-exercise-sho/src  # circleCI内のtest jobの作業directory設定
-#     steps:
-#       - checkout:   # githubの情報をcircleCI側にコピー
-#           path: ~/repec-exercise-sho
-#       - ruby/install-deps   #orbs)bundle install
-#       # - run:
-#       #     name: bundle install again
-#       #     command: bundle install --path=./vendor/bundle
-#       - run:
-#           name: Database setup
-#           command: bundle exec rails db:migrate
-#       - run:
-#           name: RSpec
-#           command: bundle exec rspec  # RSpec
-
-#   deploy:
-#     docker:
-#       - image: circleci/ruby:2.7
-#     steps:
-#       - checkout   
-#       - setup_remote_docker:  # config.yml中でdocker commandを使えるようにする
-#           version:  19.03.13
-#       - heroku/install  # orbs)config.yml中でheroku commandを使えるようにする
-#       - run:
-#           name: heroku login
-#           command: heroku container:login
-#       - run:
-#           name: push docker image
-#           command: heroku container:push web -a $HEROKU_APP_NAME  
-#           # https://app.circleci.com/pipelines/github/matsu1226/rspec-exercise-sho => environment variablesで変更
-#           # HEROKU_APP_NAME, HEROKU_API_KEY(https://dashboard.heroku.com/account)
-#       - run:
-#           name: release docker image
-#           command: heroku container:release web -a $HEROKU_APP_NAME
-#       - run:
-#           name: database setup
-#           command: heroku run bundle exec rake db:migrate RAILS_ENV=production -a $HEROKU_APP_NAME
-
-# workflows:
-#   version: 2
-#   build_test_and_deploy:
-#     jobs:
-#       - build # first job
-#       - test: # second job
-#           requires:
-#             - build # before second job
-#       - deploy: # third job
-#           requires:
-#             - test  # before third job
-#           filters:
-#             branches:
-#               only: main # Run third job only when modified "main branch" 
+      - build # first job
+      - test: # second job
+          requires:
+            - build # before second job
+      - deploy: # third job
+          requires:
+            - test  # before third job
+          filters:
+            branches:
+              only: main # Run third job only when modified "main branch" 
 
 # ※1 imageの比較(https://circleci.com/developer/images/image/cimg/ruby)
 #  A => circleci/ruby:2.7.4 (circleci/ruby:2.7)
