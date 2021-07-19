@@ -98,21 +98,21 @@ jobs:
         key: gems-{{ .Environment.CACHE_VERSION }}-{{ checksum "./Gemfile.lock"  }}-{{ .Branch }}
         paths:
         - ./vendor/bundle
-    - run:
-        name: check gem env
-        command: gem environment
-    - run:
-        name: ls 
-        command: ls /usr/local/bundle/bin   
-    - run:
-        name: which bundle
-        command: which bundle
-    - run:
-        name: which bundle exec rails
-        command: which bundle exec rails
+    # - run:
+    #     name: check gem env
+    #     command: gem environment
+    # - run:
+    #     name: ls 
+    #     command: ls /usr/local/bundle/bin   
+    # - run:
+    #     name: which bundle
+    #     command: which bundle
+    # - run:
+    #     name: which bundle exec rails
+    #     command: which bundle exec rails
     - run:
         name: Database setup
-        command: bundle exec rails db:migrate
+        command: /usr/local/bin/bundle/rails db:migrate
     - run:
         name: RSpec
         command: bundle exec rspec

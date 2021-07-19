@@ -142,6 +142,7 @@ RubyGems Environment:
      - /bin
 
 
+
 =======================================
 <<webpackエラー>>
 
@@ -153,12 +154,15 @@ bundle exec rails db:migrate
 bundler: command not found: rails
 Install missing gem executables with `bundle install`
 
+rails db:migrate
+=>
+/bin/bash: rails: command not found
+
 
 
 #予測
 bundle exec 参照のrailsコマンドが実行されない。
 bundleの参照位置がおかしい？
-
 
 
 # 解析
@@ -218,3 +222,42 @@ gem "bundler", version
 load Gem.bin_path("bundler", "bundle", version)
 end
 
+確認
+$ gem environment
+=>
+RubyGems Environment:
+  - RUBYGEMS VERSION: 3.1.6
+  - RUBY VERSION: 2.7.4 (2021-07-07 patchlevel 191) [x86_64-linux]
+  - INSTALLATION DIRECTORY: /usr/local/bundle
+  - USER INSTALLATION DIRECTORY: /home/circleci/.gem/ruby/2.7.0
+  - RUBY EXECUTABLE: /usr/local/bin/ruby
+  - GIT EXECUTABLE: /usr/bin/git
+  - EXECUTABLE DIRECTORY: /usr/local/bundle/bin
+  - SPEC CACHE DIRECTORY: /home/circleci/.gem/specs
+  - SYSTEM CONFIGURATION DIRECTORY: /usr/local/etc
+  - RUBYGEMS PLATFORMS:
+    - ruby
+    - x86_64-linux
+  - GEM PATHS:
+    - /usr/local/bundle
+    - /home/circleci/.gem/ruby/2.7.0
+    - /usr/local/lib/ruby/gems/2.7.0
+  - GEM CONFIGURATION:
+    - :update_sources => true
+    - :verbose => true
+    - :bulk_threshold => 1000
+    - "install" => "--no-document"
+    - "update" => "--no-document"
+    - :backtrace => false
+  - REMOTE SOURCES:
+    - https://rubygems.org/
+  - SHELL PATH:
+    - /home/circleci/.local/bin
+    - /usr/local/bundle/bin
+    - /usr/local/sbin
+    - /usr/local/bin
+    - /usr/sbin
+    - /usr/bin
+    - /sbin
+    - /bin
+    - /home/circleci/bin
