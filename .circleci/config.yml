@@ -40,7 +40,7 @@ jobs:
           command: bundle exec rake db:create
       - run:
           name: RSpec
-          command: bundle exec rspec /home/circleci/repec-exercise-sho/spec/
+          command: bundle exec /usr/local/bundle/bin/rspec
 
   deploy:
     docker:
