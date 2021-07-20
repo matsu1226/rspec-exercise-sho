@@ -37,7 +37,7 @@ RSpec.configure do |config|
   
   # spec/utilities.rb 中の module UtilitiesSupportを使えるようにする下準備
   # 参考：https://qiita.com/tomorun/items/4c69871c5bec062978ca
-  config.include UtilitiesSupport    
+  # config.include UtilitiesSupport    
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
