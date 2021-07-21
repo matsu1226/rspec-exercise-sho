@@ -36,14 +36,14 @@ jobs:
           name: bundle install
           command: bundle install
       - run:
+          name: rails g rspec:install
+          command: rails g rspec:install
+      - run:
           name: Database setup
           command: bundle exec rake db:create
       - run:
-          name: echo $PATH
-          command: echo $PATH
-      - run:
           name: RSpec
-          command: /usr/local/bin/bundle exec rspec
+          command: bundle exec rspec
 
   deploy:
     docker:
