@@ -5,56 +5,60 @@ orbs:
   heroku: circleci/heroku@1.2.3
 
 jobs:
-  build:  # first job => githubとの連携、bundle install
+  build:
     docker:
-      - image: circleci/ruby:2.7-node  # ※1
-    working_directory: ~/repec-exercise-sho/src   # circleCI内の作業directory設定
+      - image: circleci/ruby:2.7-node  
+    working_directory: ~/repec-exercise-sho/src 
     steps:
-      - checkout:   # githubの情報をcircleCI側にコピー
+      - checkout:
           path: ~/repec-exercise-sho
-      - ruby/install-deps   #orbs)bundle install
+      - ruby/install-deps 
 
-  test:   # second job => mySQLとrubyの導入、環境の設定
+  test: 
     docker:
       - image: circleci/ruby:2.7-node
       - image: circleci/mysql:5.5
-        environment:    # mySQLの環境 /app/config/database.yml参照
+        environment: 
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: app_test
           MYSQL_USER: root
-    environment:  # test job 全体の環境設定
+    environment:
       BUNDLE_JOBS: "3"
       BUNDLE_RETRY: "3"
-      APP_DATABASE_HOST: "127.0.0.1"  # local host の指定
+      APP_DATABASE_HOST: "127.0.0.1" 
       RAILS_ENV: test
-    working_directory: ~/repec-exercise-sho/src  # circleCI内のtest jobの作業directory設定
+    working_directory: ~/repec-exercise-sho/src
     steps:
-      - checkout:   # githubの情報をcircleCI側にコピー
+      - checkout: 
           path: ~/repec-exercise-sho
-      - ruby/install-deps   #orbs)bundle install
+      - ruby/install-deps 
+      - run:
+          name: bundle install
+          command: bundle install
       - run:
           name: Database setup
-          command: bundle exec rails db:create
+          command: bundle exec rake db:create
+      - run:
+          name: echo $PATH
+          command: echo $PATH
       - run:
           name: RSpec
-          command: bundle exec rspec  # RSpec
+          command: /usr/local/bin/bundle exec rspec
 
   deploy:
     docker:
       - image: circleci/ruby:2.7
     steps:
       - checkout   
-      - setup_remote_docker:  # config.yml中でdocker commandを使えるようにする
+      - setup_remote_docker:
           version:  19.03.13
-      - heroku/install  # orbs)config.yml中でheroku commandを使えるようにする
+      - heroku/install 
       - run:
           name: heroku login
           command: heroku container:login
       - run:
           name: push docker image
           command: heroku container:push web -a $HEROKU_APP_NAME  
-          # https://app.circleci.com/pipelines/github/matsu1226/rspec-exercise-sho => environment variablesで変更
-          # HEROKU_APP_NAME, HEROKU_API_KEY(https://dashboard.heroku.com/account)
       - run:
           name: release docker image
           command: heroku container:release web -a $HEROKU_APP_NAME
@@ -66,16 +70,16 @@ workflows:
   version: 2
   build_test_and_deploy:
     jobs:
-      - build # first job
-      - test: # second job
+      - build
+      - test:
           requires:
-            - build # before second job
-      - deploy: # third job
+            - build
+      - deploy:
           requires:
-            - test  # before third job
+            - test 
           filters:
             branches:
-              only: main # Run third job only when modified "main branch" 
+              only: main
 
 # ※1 imageの比較(https://circleci.com/developer/images/image/cimg/ruby)
 #  A => circleci/ruby:2.7.4 (circleci/ruby:2.7)
