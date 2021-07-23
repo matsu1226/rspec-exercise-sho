@@ -35,7 +35,7 @@ jobs:
       - run:
           name: bundle install
           command: bundle install
-      # rails, rspecコマンド動作せず、CIはあきらめてCDだけやる？
+      # rails, rspecコマンド動作せず、CIはあきらめてCDだけやる。
       # - run:
       #     name: rails g rspec:install
       #     command: rails g rspec:install
