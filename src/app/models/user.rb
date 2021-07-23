@@ -10,4 +10,11 @@ class User < ApplicationRecord
   # セキュアパスワードの導入(パスワード.パスワードの確認を入力。=>ハッシュ化したものをDBに保存)
   validates :password, presence: true, length: { minimum: 6 }
   validates :password_confirmation, presence: true
+
+    # 渡された文字列のハッシュ値を返す
+    # def User.digest(string)
+    #   cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+    #                                                 BCrypt::Engine.cost
+    #   BCrypt::Password.create(string, cost: cost)
+    # end
 end

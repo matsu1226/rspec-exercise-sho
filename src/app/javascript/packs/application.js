@@ -11,3 +11,7 @@ import "channels"
 Rails.start()
 Turbolinks.start()
 ActiveStorage.start()
+
+// jQueryの導入
+require("jquery")
+import "bootstrap"
