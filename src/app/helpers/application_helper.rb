@@ -1,4 +1,5 @@
-module ApplicationHelper  # Railsでは自動的にヘルパーモジュールを読み込んでくれる=>includeをわざわざ書く必要がない。
+module ApplicationHelper  
+  # Railsでは自動的にヘルパーモジュールを読み込んでくれる=>includeをわざわざ書く必要がない。
   # カスタムヘルパー
   # ページごとの完全なタイトルを返します。
   def full_title(page_title = '')   # オプション引数('')も設定

@@ -1,0 +1,23 @@
+<% provide(:title, "Log in") %>
+<h1>Log in</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+  <%# 特定のモデルと結びつかない時はmodelではなくscope + url %>
+    <%= form_with(url: login_path, scope: :session, local: true) do |f| %>
+    <%# # sessionメソッドで作成された一時cookies => ブラウザを閉じたら期限終了 %>
+
+      <%= f.label :email %>
+      <%= f.email_field :email, class: "form-control" %>
+      <%# label for="session_email" %>
+      <%# input id="session_email name="session[email]" type="email %>
+
+      <%= f.label :password %>
+      <%= f.password_field :password, class: "form-control" %>
+
+      <%= f.submit "Log in", class: "btn btn-primary" %>
+    <% end %>
+
+    <p>New user?<%= link_to "Signup now!", signup_path  %></p>
+  </div>
+</div>
