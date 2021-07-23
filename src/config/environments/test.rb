@@ -57,4 +57,7 @@ Rails.application.configure do
 
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
+
+  # bcryptのコスト関数を下げることでテスト速度を向上させる
+  ActiveModel::SecurePassword.min_cost = true
 end
