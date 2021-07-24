@@ -10,10 +10,12 @@ describe User do
 
   it { should respond_to(:name) }   # @userがname method(もしくはattributes)を持つことを確認
   it { should respond_to(:email) }
-  it { should respond_to(:password_digest) }
   it { should respond_to(:password) }
+  it { should respond_to(:password_digest) }
   it { should respond_to(:password_confirmation) }
   it { should respond_to(:authenticate) }
+  it { should respond_to(:remember_digest) }
+  it { should respond_to(:remember_token) }
 
   it { should be_valid }  # User model の validate test( = "@user.valid?")
 
@@ -108,5 +110,9 @@ describe User do
     end
 
   end
+
+  # describe "remember token" do
+  #   before { @user.save }
+  # end
 
 end
