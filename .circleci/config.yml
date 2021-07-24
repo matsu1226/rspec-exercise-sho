@@ -33,18 +33,18 @@ jobs:
       - checkout: 
           path: ~/repec-exercise-sho
       - ruby/install-deps 
-      - node/install-packages:
-          pkg-manager: yarn
-          cache-key: "yarn.lock"
-      - run:
-          name: bundle install
-          command: bundle check --path=vendor/bundle ||bundle install --path=vendor/bundle
+      # - node/install-packages:
+      #     pkg-manager: yarn
+      #     cache-key: "yarn.lock"
+      # - run:
+      #     name: bundle install
+      #     command: bundle check --path=vendor/bundle ||bundle install --path=vendor/bundle
       - run:
           name: Database setup
           command: bundle exec rake db:create
-      - run:
-          name: RSpec
-          command: bundle exec rspec
+      # - run:
+      #     name: RSpec
+      #     command: bundle exec rspec
 
   deploy:
     docker:
