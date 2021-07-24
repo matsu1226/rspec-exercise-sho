@@ -25,6 +25,7 @@ jobs:
     environment:
       BUNDLE_JOBS: "3"
       BUNDLE_RETRY: "3"
+      BUNDLE_PATH: vendor/bundle
       APP_DATABASE_HOST: "127.0.0.1" 
       RAILS_ENV: test
     working_directory: ~/repec-exercise-sho/src
@@ -32,13 +33,12 @@ jobs:
       - checkout: 
           path: ~/repec-exercise-sho
       - ruby/install-deps 
-      - run:
-          name: bundle install
-          command: bundle install
-      # rails, rspecコマンド動作せず、CIはあきらめてCDだけやる。
+      # - node/install-packages:
+      #     pkg-manager: yarn
+      #     cache-key: "yarn.lock"
       # - run:
-      #     name: rails g rspec:install
-      #     command: rails g rspec:install
+      #     name: bundle install
+      #     command: bundle check --path=vendor/bundle ||bundle install --path=vendor/bundle
       - run:
           name: Database setup
           command: bundle exec rake db:create
