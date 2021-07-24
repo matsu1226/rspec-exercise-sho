@@ -33,6 +33,12 @@ jobs:
       - checkout: 
           path: ~/repec-exercise-sho
       - ruby/install-deps 
+      - node/install-packages:
+          pkg-manager: yarn
+          cache-key: "yarn.lock"
+      - run:
+          name: bundle install
+          command: bundle check --path=vendor/bundle ||bundle install --path=vendor/bundle
       - run:
           name: Database setup
           command: bundle exec rake db:create
