@@ -13,5 +13,5 @@ Turbolinks.start()
 ActiveStorage.start()
 
 // jQueryの導入
-require("jquery")
+import "jquery"
 import "bootstrap"
