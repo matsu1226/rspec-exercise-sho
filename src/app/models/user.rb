@@ -11,7 +11,7 @@ class User < ApplicationRecord
   has_secure_password
   # bcrypt gem(ビー・クリプト)
   # セキュアパスワードの導入(パスワード.パスワードの確認を入力。=>ハッシュ化したものをDBに保存)
-  validates :password, presence: true, length: { minimum: 6 }
+  validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
   validates :password_confirmation, presence: true
 
   # 渡された文字列のハッシュ値を返すクラスメソッド(tokenをdigestに変換)
