@@ -27,11 +27,12 @@ describe "Authentication" do
 
     describe "with valid information" do
       let(:user) { FactoryGirl.create(:user) }
-      before do
-        fill_in "Email",    with: user.email.upcase
-        fill_in "Password", with: user.password
-        click_button "Log in"
-      end
+      # before do
+      #   fill_in "Email",    with: user.email.upcase
+      #   fill_in "Password", with: user.password
+      #   click_button "Log in"
+      # end
+      before { sign_in user }
 
       it { should have_title(user.name) }
       it { should have_link("Users", href: users_path) }
@@ -52,6 +53,11 @@ describe "Authentication" do
     describe "for non-signed-in users" do   # check "before_action" filter
       let(:user) { FactoryGirl.create(:user) }
 
+      it { should_not have_link("Users", href: users_path) }
+      it { should_not have_link("Profile", href: user_path(user)) }
+      it { should_not have_link("Settings", href: edit_user_path(user)) }
+      it { should_not have_link("Log out", href: logout_path) }
+
       describe "when attempting to visit a protected page" do
         before do
           visit edit_user_path(user)  # loginしていないのでLogin pageに飛ぶ
@@ -62,6 +68,17 @@ describe "Authentication" do
           it "should render the desired protected page" do
             # frinendly forwording(login前にいたedit_user_path(user)に遷移)
             expect(page).to have_title("Edit user")   
+          end
+
+          describe "when loging in again" do
+            before do
+              delete logout_path
+              sign_in user
+            end
+
+            it "should render the default(profile) page" do
+              expect(page).to have_title(user.name)
+            end
           end
         end
       end
@@ -85,25 +102,32 @@ describe "Authentication" do
       
     end
 
-    describe "as wrong user" do
+    pending "as wrong user" do
       let(:user) { FactoryGirl.create(:user) }
       let(:wrong_user) { FactoryGirl.create(:user, email: "wrong@example.com") }
-      before { sign_in user, no_capybara: true }
+      # before { sign_in user, no_capybara: true }
+      before do
+        visit login_path
+        fill_in "Email",    with: user.email
+        fill_in "Password", with: user.password
+        click_button "Log in"
+      end
 
-      describe "submitting a GET request to the Users#edit action" do
+      # users_controllerのcorrect_user methodの検証
+      describe "submitting a GET request to the Users#edit action" do   
         before { get edit_user_path(wrong_user) }   # users#edit
         specify { expect(response.body).not_to match(full_title("Edit user")) }
         specify { expect(response).to redirect_to(root_url) }
       end
 
+      # users_controllerのcorrect_user methodの検証
       describe "submitting a PATCH request to the Users#update action" do
         before { patch user_path(wrong_user) }    # users#update
         specify { expect(response).to redirect_to(root_url) }
       end
-
     end
 
-    describe "as non-admin user" do
+    pending "as non-admin user" do
       let(:user) { FactoryGirl.create(:user) }
       let(:non_admin) { FactoryGirl.create(:user) }
 
