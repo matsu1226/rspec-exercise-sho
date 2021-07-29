@@ -21,7 +21,7 @@ module SessionsHelper
     elsif (user_id = cookies.signed[:user_id])  
       user = User.find_by(id: user_id)
       # 2-1, cookie(永続ログイン)情報があるuserがDBに存在 && remember_tokenが一致
-      if user & user.authenticated?(cookies[:remember_token])
+      if user & user.authenticated?(:remember, cookies[:remember_token])
         log_in user
         @current_user = user
       end

@@ -1,8 +1,10 @@
 class User < ApplicationRecord
   # remember_token => 変数として定義し、get/setできるが、DBには保存しない(仮想の属性)。
-  attr_accessor :remember_token 
+  attr_accessor :remember_token, :activation_token
 
-  before_save { self.email = email.downcase }   # emailはDBに大文字小文字の区別なしで格納
+  before_save :downcase_email # before_save => オブジェクト保存直前 = オブジェクトの作成時 + 更新時
+  before_create :create_activation_digest   # before_create => オブジェクトが作成時のみ
+
   validates :name, presence: true, length: { maximum: 50 }
   # => validates (:name, {presence: true, length: {maximum: 50}} )
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i    # 正規表現 (regular expression)
@@ -10,7 +12,7 @@ class User < ApplicationRecord
   
   has_secure_password
   # bcrypt gem(ビー・クリプト)
-  # セキュアパスワードの導入(パスワード.パスワードの確認を入力。=>ハッシュ化したものをDBに保存)
+  # セキュアパスワードの導入(パスワード.パスワードの確認を入力。=>ハッシュ化したpassword_digestをDBに保存)
   validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
   validates :password_confirmation, presence: true
 
@@ -36,15 +38,41 @@ class User < ApplicationRecord
   end
 
   # 渡されたトークンがダイジェストと一致したらtrueを返す
-  # remember_digest == user.digest(remember_token) ?
-  def authenticated?(remember_token)
-    return false if remember_digest.nil?
-    BCcrypt::Password.new(remember_digest).is_password?(remember_token)
+  # remember_digest == user.digest(remember_token)? 
+  # activate_digest == user.digest(activated_token)?
+  def authenticated?(attribute, token)
+    digest = send("#{attribute}_digest")
+    return false if digest.nil?
+    BCcrypt::Password.new(digest).is_password?(token)
   end
 
   # ユーザーのログイン情報を破棄する
   def forget
     update_attribute(:remember_digest, nil)
   end
+
+  # アカウントを有効にする
+  def activate
+    # update_attribute(:activated, true)
+    # update_attribute(:activated_at, Time.zone.now)
+    update_columus(activated: true, activated_at: Time.zone.now)
+  end
+
+  # 有効化用のメールを送信する
+  def send_activation_email
+    UserMailer.account_activation(self).deliver_now
+  end
+
+  private
+    #メアドを全て小文字にする(emailはDBに大文字小文字の区別なしで格納)
+    def downcase_email
+      self.email = email.downcase
+    end
+
+    # 有効化トークンとダイジェストを作成及び代入する
+    def create_activation_digest
+      self.activation_token = User.new_token
+      self.activation_digest = User.digest(activation_token)
+    end
 
 end
