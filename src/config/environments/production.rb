@@ -69,8 +69,9 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true     # 電子メールが配信完了できない場合に、エラーを発生させるか
   config.action_mailer.delivery_method = :smtp
   host = 'rspec-exercise-sho.herokuapp.com'
+  config.action_mailer.default_url_options = { host: host }  
 
-  config.action_mailer.default_url_options = { host: host }  ActionMailer::Base.smtp_settings = {
+  ActionMailer::Base.smtp_settings = {
     :port           => ENV['MAILGUN_SMTP_PORT'],
     :address        => ENV['MAILGUN_SMTP_SERVER'],
     :user_name      => ENV['MAILGUN_SMTP_LOGIN'],
