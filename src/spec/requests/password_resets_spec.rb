@@ -49,16 +49,15 @@ describe "PasswordResets" do
 
 
 
-  pending "after sending email" do
+  describe "after sending email" do
     let(:activated_user) { FactoryGirl.create(:activated_user) }
-    let(:reset_token) { SecureRandom.urlsafe_base64 }
+    # let!(:reset_token) { SecureRandom.urlsafe_base64 }
     let(:password_reset_mail) { UserMailer.password_reset(activated_user) }
-
+    
     before do
-      # mail_body = password_reset_mail.body.encoded              # 本文をエンコードして取得
-      # password_reset_url = URI.extract(mail_body)[0]            # 文字列からURLの配列で取得。今回はURLは１つだけなので1番目を取得
-      # visit password_reset_url
-      visit edit_password_reset_url(reset_token, email: activated_user.email)
+      activated_user.create_reset_digest    # reset_token, reset_digest, reset_sent_at
+      visit edit_password_reset_url(activated_user.reset_token, email: activated_user.email)   
+      # conntrollerのbafore_action valid_user参照
     end
 
     describe "reset_password_page" do
