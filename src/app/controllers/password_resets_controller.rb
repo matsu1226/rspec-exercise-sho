@@ -27,7 +27,7 @@ class PasswordResetsController < ApplicationController
       @user.errors.add(:password, :blank)   # passwordが空欄でないことを確認
       render "edit"
     elsif @user.update(user_params)
-      login @user
+      log_in @user
       flash[:success] = "Password has been reset."
       redirect_to @user
     else                 # passwordが正しくない場合
