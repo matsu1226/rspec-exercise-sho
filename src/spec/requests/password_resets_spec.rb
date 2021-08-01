@@ -48,7 +48,6 @@ describe "PasswordResets" do
   end
 
 
-
   describe "after sending email" do
     let(:activated_user) { FactoryGirl.create(:activated_user) }
     # let!(:reset_token) { SecureRandom.urlsafe_base64 }
