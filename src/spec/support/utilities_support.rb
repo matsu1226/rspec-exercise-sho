@@ -17,3 +17,9 @@ def sign_in(user, options={})
     click_button "Log in"
   end
 end
+
+# def new_token
+#   SecureRandom.urlsafe_base64
+#   # SecureRandomモジュールのurlsafe_base64メソッド
+#   # A–Z、a–z、0–9、"-"、"_"（64種類）からなる長さ22のランダムな文字列を返す
+# end

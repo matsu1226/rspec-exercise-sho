@@ -8,6 +8,7 @@ describe "Authentication" do
 
     it { should have_content("Log in") }
     it { should have_title("Log in") }
+    it { should have_link("(forget password)", href: new_password_reset_path) }
   end
 
   describe "login" do

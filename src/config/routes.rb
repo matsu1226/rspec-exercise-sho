@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
   resources :users
   resources :account_activations, only: [:edit]
+  resources :password_resets,     only: [:new, :create, :edit, :update]
 
 end
 
@@ -30,3 +31,9 @@ end
 
 # resources :account_activations の内容
 # GET	    /account_activation/トークン/edit	  edit	  edit_account_activation_path(token)	
+
+# resources :password_resets の内容
+# GET	  /password_resets/new	          new	    new_password_reset_path     (log in前)forgetパスワード画面の表示
+# POST	/password_resets	              create  password_resets_path        forgetパスワードメール送付
+# GET	  /password_resets/トークン/edit	edit	  edit_password_reset_url(token)  
+# PATCH	/password_resets/トークン	      update	password_reset_url(token)
