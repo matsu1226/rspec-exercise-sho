@@ -149,8 +149,13 @@ describe "User pages" do
           fill_in "Password",     with: "foobar"
           fill_in "Confirmation", with: "foobar"
         end
+        
+        after(:all) {
+          # 意図的にテスト後にクリアにする
+          ActionMailer::Base.deliveries.clear
+        }
   
-        it "should create a user" do
+        it "hoge should create a user" do
           expect { click_button submit }.to change(User, :count).by(1)
         end
 
