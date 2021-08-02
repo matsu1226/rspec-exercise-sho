@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  # :destroy => userインスタンスが削除されるときに、関連付けられたオブジェクト(micropost)のdestroyメソッドが実行
+  has_many :microposts, dependent: :destroy
   # remember_token => 変数として定義し、get/setできるが、DBには保存しない(仮想の属性)。
   attr_accessor :remember_token, :activation_token, :reset_token
 

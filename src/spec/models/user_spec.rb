@@ -17,6 +17,7 @@ describe User do
   it { should respond_to(:remember_digest) }
   it { should respond_to(:remember_token) }
   it { should respond_to(:admin) }
+  it { should respond_to(:microposts) }
 
   it { should be_valid }  # User model の validate test( = "@user.valid?")
   it { should_not be_admin }
@@ -122,8 +123,26 @@ describe User do
 
   end
 
-  # describe "remember token" do
-  #   before { @user.save }
-  # end
+  describe "micropost assoxiations" do
+    before { @user.save }
+    let!(:older_micropost) do   # "!"をつけることで即参照される（遅延参照されない）
+      FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
+    end
+    let!(:newer_micropost) do
+      FactoryGirl.create(:micropost, user: @user, created_at: 1.hour.ago)
+    end
 
+    it "should have the right microposts in the right order" do
+      expect(@user.microposts.to_a).to eq [newer_micropost, older_micropost]
+    end
+
+    it "should destroy associated microposts" do
+      microposts = @user.microposts.to_a  # to_aメソッド=>マイクロポストのコピーが配列化されて作成
+      @user.destroy                       # DB上で@userとそれに紐づくmicropostが削除(変数micropostsは存在したまま)
+      expect(microposts).not_to be_empty
+      microposts.each do |micropost|
+        expect(Micropost.where(id: micropost.id)).to be_empty
+      end
+    end
+  end
 end
