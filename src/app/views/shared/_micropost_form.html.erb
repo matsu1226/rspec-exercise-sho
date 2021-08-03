@@ -1,0 +1,8 @@
+<% form_with(model: @micropost, local: true) do |f| %>
+  <%# error_messagesパーシャルの変数objectに@micropostを代入 %>
+  <%= render "shared/error_messages", object: f.object %>
+  <div class="field">
+    <%= f.text_area :content, placeholdet: "Compose new micropost..." %>
+  </div>
+  <%= f.submit "Post", class: "btn btn-priamry" %>
+<% end %>
