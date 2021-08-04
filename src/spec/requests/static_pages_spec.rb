@@ -55,4 +55,20 @@ describe "StaticPages" do
     expect(page).to have_title(full_title(""))
   end
 
+  describe "for ligged-in users" do
+    let(:activated_user) { FactoryGirl.create(:activated_user) }
+    before do
+      FactoryGirl.create(:micropost, user: activated_user, content: "Lorem ipsum")
+      FactoryGirl.create(:micropost, user: activated_user, content: "Dolor sit amet")
+      sign_in activated_user
+      visit root_path
+    end
+
+    it "should render the user's feed" do
+      activated_user.feed.each do |item|
+        expect(page).to have_selector("li#micropost-#{item.id}", text: item.content)
+      end
+    end
+  end
+
 end

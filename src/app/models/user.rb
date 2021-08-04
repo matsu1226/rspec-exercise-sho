@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  # :destroy => userインスタンスが削除されるときに、関連付けられたオブジェクト(micropost)のdestroyメソッドが実行
+  has_many :microposts, dependent: :destroy
   # remember_token => 変数として定義し、get/setできるが、DBには保存しない(仮想の属性)。
   attr_accessor :remember_token, :activation_token, :reset_token
 
@@ -80,6 +82,12 @@ class User < ApplicationRecord
   def password_reset_expired?
     reset_sent_at < 2.hours.ago
   end
+  
+  # 試作feedの定義
+  def feed
+    Micropost.where("user_id=?", id)
+  end
+
 
   private
     #メアドを全て小文字にする(emailはDBに大文字小文字の区別なしで格納)

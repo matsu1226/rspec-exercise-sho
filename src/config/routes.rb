@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   resources :users
   resources :account_activations, only: [:edit]
   resources :password_resets,     only: [:new, :create, :edit, :update]
+  resources :microposts,          only: [:create, :destroy]
 
 end
 
@@ -37,3 +38,7 @@ end
 # POST	/password_resets	              create  password_resets_path        forgetパスワードメール送付
 # GET	  /password_resets/トークン/edit	edit	  edit_password_reset_url(token)  
 # PATCH	/password_resets/トークン	      update	password_reset_url(token)
+
+# resources :microposts の内容
+# POST	  /microposts	    create	  microposts_path
+# DELETE	/microposts/1	  destroy	  micropost_path(micropost)

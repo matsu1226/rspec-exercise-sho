@@ -15,6 +15,7 @@ FactoryGirl.define do
     end
   end
 
+  
   factory :wrong_user do
     sequence(:name)   { |n| "Person #{n}"}
     email "wrong@example.com"
@@ -23,7 +24,12 @@ FactoryGirl.define do
     password_confirmation "foobar"
     
     activated true
-
+    
   end
+  
 
+  factory :micropost do
+    content "Lorem ipsum"
+    user
+  end
 end
