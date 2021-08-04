@@ -3,7 +3,6 @@ require 'rails_helper'
 describe Micropost do
   let(:user) { FactoryGirl.create(:user) }
   before do
-    # このコードは慣用的に正しくない
     @micropost = user.microposts.build( content: "Lorem ipsum" )
   end
 
@@ -12,8 +11,9 @@ describe Micropost do
   it { should respond_to(:content) }  # respond_to(:method) => メソッドがあることをテスト
   it { should respond_to(:user_id) }
   it { should respond_to(:user) }
-  its(:user) { should eq user }   # @micropost.user == user
-  
+  # its(:user) { should eq user }
+  it { expect(@micropost.user).to eq user }
+
   it { should be_valid }
 
   describe "when user_id is not present" do

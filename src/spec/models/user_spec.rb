@@ -18,6 +18,7 @@ describe User do
   it { should respond_to(:remember_token) }
   it { should respond_to(:admin) }
   it { should respond_to(:microposts) }
+  it { should respond_to(:feed) }
 
   it { should be_valid }  # User model の validate test( = "@user.valid?")
   it { should_not be_admin }
@@ -123,7 +124,7 @@ describe User do
 
   end
 
-  describe "micropost assoxiations" do
+  describe "micropost associations" do
     before { @user.save }
     let!(:older_micropost) do   # "!"をつけることで即参照される（遅延参照されない）
       FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
@@ -143,6 +144,19 @@ describe User do
       microposts.each do |micropost|
         expect(Micropost.where(id: micropost.id)).to be_empty
       end
+    end
+
+    describe "status" do
+      let(:unfollowed_post) do
+        FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
+      end
+
+      # its(:feed) { should include(older_micropost) }
+      # its(:feed) { should include(newer_micropost) }
+      # its(:feed) { should_not include(unfollowed_post) }
+      it { expect(@user.feed).to include(older_micropost) }
+      it { expect(@user.feed).to include(newer_micropost) }
+      it { expect(@user.feed).not_to include(unfollowed_post) }
     end
   end
 end
