@@ -55,7 +55,7 @@ describe "StaticPages" do
     expect(page).to have_title(full_title(""))
   end
 
-  describe "for ligged-in users" do
+  describe "for logged-in users" do
     let(:activated_user) { FactoryGirl.create(:activated_user) }
     before do
       FactoryGirl.create(:micropost, user: activated_user, content: "Lorem ipsum")
@@ -68,6 +68,17 @@ describe "StaticPages" do
       activated_user.feed.each do |item|
         expect(page).to have_selector("li#micropost-#{item.id}", text: item.content)
       end
+    end
+
+    describe "follower/following counts" do
+      let(:other_user) { FactoryGirl.create(:user) }
+      before do
+        other_user.follow(activated_user)
+        visit root_path
+      end
+
+      it { should have_link("0 following", href: following_user_path(activated_user)) }
+      it { should have_link("1 followers", href: followers_user_path(activated_user)) }
     end
   end
 

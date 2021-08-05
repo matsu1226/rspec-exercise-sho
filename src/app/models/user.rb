@@ -1,6 +1,13 @@
 class User < ApplicationRecord
   # :destroy => userインスタンスが削除されるときに、関連付けられたオブジェクト(micropost)のdestroyメソッドが実行
   has_many :microposts, dependent: :destroy
+  
+  has_many :active_relationships, class_name: "Relationship" , foreign_key: "follower_id", dependent: :destroy  # user.active_realtionships が使える
+  has_many :following, through: :active_relationships, source: :followed  # user.following の追加
+
+  has_many :passive_relationships, class_name: "Relationship", foreign_key: "followed_id", dependent: :destroy  # user.passive_relationships が使える
+  has_many :followers, through: :passive_relationships, source: :follower  # user.follower の追加
+
   # remember_token => 変数として定義し、get/setできるが、DBには保存しない(仮想の属性)。
   attr_accessor :remember_token, :activation_token, :reset_token
 
@@ -86,6 +93,23 @@ class User < ApplicationRecord
   # 試作feedの定義
   def feed
     Micropost.where("user_id=?", id)
+  end
+
+  # ユーザーをフォローする
+  def follow(other_user)
+    following << other_user
+    # = self.active_realtionships.create(followed_id: other_user.id)
+    # = active_realtionships.create(followed_id: other_user.id)
+  end
+
+  # ユーザーをフォロー解除する
+  def unfollow(other_user)
+    active_relationships.find_by(followed_id: other_user.id).destroy
+  end
+
+  # 現在のユーザーがフォローしてたらtrueを返す
+  def following?(other_user)
+    following.include?(other_user)
   end
 
 
