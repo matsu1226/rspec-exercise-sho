@@ -50,3 +50,7 @@ end
 # resources :microposts の内容
 # POST	  /microposts	    create	  microposts_path
 # DELETE	/microposts/1	  destroy	  micropost_path(micropost)
+
+# resources :relationships の内容
+# POST	  /relationships	    create	  relationships_path
+# DELETE	/relationships/1	  destroy	  relationship_path(1)

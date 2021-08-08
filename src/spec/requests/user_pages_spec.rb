@@ -51,8 +51,8 @@ describe "User pages" do
     end
 
     describe "edit page"do
-      let(:activated_user) { FactoryGirl.create(:activated_user) }
-      # before { visit edit_user_path(user) }
+      # let(:activated_user) { FactoryGirl.create(:activated_user) }
+      # # before { visit edit_user_path(user) }
       before do
         sign_in activated_user
         visit edit_user_path(activated_user)
@@ -118,6 +118,79 @@ describe "User pages" do
         it { should have_content(m1.content) }
         it { should have_content(m2.content) }
         it { should have_content(activated_user.microposts.count) }
+      end
+
+      describe "follow/unfolllw buttons" do
+        let(:other_user) { FactoryGirl.create(:user) }
+        # before { sign_in activated_user }
+
+        describe "following a user" do
+          before { visit user_path(other_user) }
+
+          it "should increment the followed user count" do
+            expect do
+              click_button "Follow"
+            end.to change(activated_user.following, :count).by(1)
+          end
+
+          it "should increment the other user's followers count" do
+            expect do
+              click_button "Follow"
+            end.to change(other_user.followers, :count).by(1)
+          end
+
+          describe "toggling the button" do
+            before { click_button "Follow" }
+            it { should have_xpath("//input[@value='Unfollow']") }       #
+          end
+        end
+
+        describe "unfollow a user" do
+          before do
+            activated_user.follow(other_user)
+            visit user_path(other_user)
+          end
+
+          it "should decrement the followed user count" do      ##
+            expect do
+              click_button "Unfollow"
+            end.to change(activated_user.following, :count).by(-1)
+          end
+
+          it "should decrement the other user's followers count" do       ##
+            expect do
+              click_button "Unfollow"
+            end.to change(other_user.followers, :count).by(-1)
+          end
+
+          describe "toggling the button" do
+            before { click_button "Unfollow" }
+            it { should have_xpath("//input[@value='Follow']") }        ##
+          end
+
+        end
+      end
+    end
+
+    describe "following/followers" do
+      let(:activated_user) { FactoryGirl.create(:activated_user) }
+      let(:other_user) { FactoryGirl.create(:user) }
+      before { activated_user.follow(other_user) }
+
+      describe "followed users" do
+        before { visit following_user_path(activated_user) }
+
+        it { should have_title(full_title("Following")) }
+        it { should have_selector("h3", text: "Following") }
+        it { should have_link(other_user.name, href: user_path(other_user)) }
+      end
+
+      describe "followers users" do
+        before { visit followers_user_path(other_user) }
+
+        it { should have_title(full_title("Followers")) }
+        it { should have_selector("h3", text: "Followers") }
+        it { should have_link(activated_user.name, href: user_path(activated_user)) }
       end
     end
 

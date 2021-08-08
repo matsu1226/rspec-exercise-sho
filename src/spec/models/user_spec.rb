@@ -155,6 +155,7 @@ describe User do
       let(:unfollowed_post) do
         FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
       end
+      let(:followed_user) { FactoryGirl.create(:user) }
 
       it { expect(@user.feed).to include(older_micropost) }
       it { expect(@user.feed).to include(newer_micropost) }
