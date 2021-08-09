@@ -19,6 +19,11 @@ describe User do
   it { should respond_to(:admin) }
   it { should respond_to(:microposts) }
   it { should respond_to(:feed) }
+  it { should respond_to(:active_relationships) }
+  it { should respond_to(:following) }
+  it { should respond_to(:following?) }
+  it { should respond_to(:follow) }
+  it { should respond_to(:unfollow) }
 
   it { should be_valid }  # User model の validate test( = "@user.valid?")
   it { should_not be_admin }
@@ -150,13 +155,43 @@ describe User do
       let(:unfollowed_post) do
         FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
       end
+      let(:followed_user) { FactoryGirl.create(:user) }
 
-      # its(:feed) { should include(older_micropost) }
-      # its(:feed) { should include(newer_micropost) }
-      # its(:feed) { should_not include(unfollowed_post) }
-      it { expect(@user.feed).to include(older_micropost) }
+      before do
+        @user.follow(followed_user)
+        3.times { followed_user.microposts.create(content: "Lorem ipsum") }
+      end
+
+      it { expect(@user.feed).to include(older_micropost) }   # 自身のmicropostをfeedに含める
       it { expect(@user.feed).to include(newer_micropost) }
-      it { expect(@user.feed).not_to include(unfollowed_post) }
+      it { expect(@user.feed).not_to include(unfollowed_post) }   # 自身がフォローしていないuserのmicropostを含めない
+      it "" do                                                    # 自身がフォローしているuserのmicropostを含める
+        followed_user.microposts.each do |micropost|
+          expect(@user.feed).to include(micropost)
+        end
+      end
+    end
+  end
+
+  describe "following" do
+    let(:other_user) { FactoryGirl.create(:user) }
+    before do
+      @user.save
+      @user.follow(other_user)
+    end
+
+    it { should be_following(other_user) }    # "@user.following?(other_user)==true"?
+    it { expect(@user.following).to include(other_user) }
+
+    describe "followed users" do
+      it { expect(other_user.followers).to include(@user) }
+    end
+
+    describe "and unfollowing" do
+      before { @user.unfollow(other_user) }
+
+      it { should_not be_following(other_user) }
+      # it { expect(@user.following).not_to include(other_user) }
     end
   end
 end

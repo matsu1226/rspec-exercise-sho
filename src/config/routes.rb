@@ -9,10 +9,15 @@ Rails.application.routes.draw do
   post '/login',    to: "sessions#create"
   delete '/logout', to: "sessions#destroy"
 
-  resources :users
+  resources :users do
+    member do     # idを含む=>member routing , idを含まない=>colloection routing
+      get :following, :followers
+    end
+  end
   resources :account_activations, only: [:edit]
   resources :password_resets,     only: [:new, :create, :edit, :update]
   resources :microposts,          only: [:create, :destroy]
+  resources :relationships,       only: [:create, :destroy]
 
 end
 
@@ -30,6 +35,9 @@ end
 # PATCH	  /users/1	    update	user_path(user)	      ユーザーを更新するアクション
 # DELETE	/users/1	    destroy	user_path(user)	      ユーザーを削除するアクション
 
+# GET   /users/1/following  following   following_user_path(1)
+# GET   /users/1/followers  followers   followers_user_path(1)
+
 # resources :account_activations の内容
 # GET	    /account_activation/トークン/edit	  edit	  edit_account_activation_path(token)	
 
@@ -42,3 +50,7 @@ end
 # resources :microposts の内容
 # POST	  /microposts	    create	  microposts_path
 # DELETE	/microposts/1	  destroy	  micropost_path(micropost)
+
+# resources :relationships の内容
+# POST	  /relationships	    create	  relationships_path
+# DELETE	/relationships/1	  destroy	  relationship_path(1)
