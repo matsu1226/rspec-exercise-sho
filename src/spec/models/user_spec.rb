@@ -157,9 +157,19 @@ describe User do
       end
       let(:followed_user) { FactoryGirl.create(:user) }
 
-      it { expect(@user.feed).to include(older_micropost) }
+      before do
+        @user.follow(followed_user)
+        3.times { followed_user.microposts.create(content: "Lorem ipsum") }
+      end
+
+      it { expect(@user.feed).to include(older_micropost) }   # 自身のmicropostをfeedに含める
       it { expect(@user.feed).to include(newer_micropost) }
-      it { expect(@user.feed).not_to include(unfollowed_post) }
+      it { expect(@user.feed).not_to include(unfollowed_post) }   # 自身がフォローしていないuserのmicropostを含めない
+      it "" do                                                    # 自身がフォローしているuserのmicropostを含める
+        followed_user.microposts.each do |micropost|
+          expect(@user.feed).to include(micropost)
+        end
+      end
     end
   end
 

@@ -1,5 +1,23 @@
 <%# from "follow_form" %>
+
+<%# user_id: 1　にてログインして確認したコード↓ 
+http://localhost:3000/users/3
+<form action="/relationships/1" accept-charset="UTF-8" method="post">
+<input type="hidden" name="_method" value="delete">
+<input type="hidden" name="authenticity_token" value="KVSsuKXpM-IlzA0N_ztqfefNMfUHgw6iaNdDJLzeXgKsDGSL4R0xV0suzee0IHKOqg07yz44i87GAjbAEHgL9w">
+<input type="submit" name="commit" value="Unfollow" class="btn" data-disable-with="Unfollow">
+</form> 
+
+---
+mysql> SELECT * FROM relationships;
++----+-------------+-------------+----------------------------+----------------------------+
+| id | follower_id | followed_id | created_at                 | updated_at                 |
++----+-------------+-------------+----------------------------+----------------------------+
+|  1 |           1 |           3 | 2021-08-05 13:22:45.127025 | 2021-08-05 13:22:45.127025 |
+
+%>
+
 <%= form_with(model: current_user.active_relationships.find_by(followed_id: @user.id), 
-              html: {method: :delete}, remote: true ) do |f| %>
+              html: {method: :delete}, local: false ) do |f| %>
   <%= f.submit "Unfollow", class: "btn"  %>
 <% end %>

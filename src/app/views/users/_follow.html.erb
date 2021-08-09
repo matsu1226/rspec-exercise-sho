@@ -1,5 +1,5 @@
 <%# from "follow_form" %>
-<%= form_with(model: current_user.active_relationships.build, remote: true ) do |f| %>
+<%= form_with(model: current_user.active_relationships.build, local: false) do |f| %>
 <%# <form action="/relationships/117" class="edit_relationship" data-remote="true" id="edit_relationship_117" method="post">%>
   <div><%= hidden_field_tag :followed_id, @user.id %></div>
   <%= f.submit "Follow", class: "btn btn-primary"  %>
